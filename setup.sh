@@ -21,10 +21,10 @@ if ! command -v sshpass &> /dev/null; then
 fi
 
 # 3. Deploy to Remote Server
-echo "[i] Connecting to $REMOTE_IP..."
+echo "[i] Connecting to $REMOTE_IP and installing automation..."
 export SSHPASS="$REMOTE_PASS"
 
-# Install MTProxyMax and Automation
+# Install MTProxyMax and Automation on the remote server
 sshpass -e ssh -o StrictHostKeyChecking=no "$REMOTE_USER@$REMOTE_IP" "curl -sL https://raw.githubusercontent.com/TETRIX8/Mtproxymax-script-/main/install_automation.sh | bash"
 
 # 4. Show Status and API Info
