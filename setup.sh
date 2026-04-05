@@ -1,5 +1,8 @@
 #!/bin/bash
-# MTProxyMax Interactive Deployer
+# MTProxyMax Interactive Deployer (Fixed for curl | bash)
+
+# Force input from TTY if running via curl | bash
+exec < /dev/tty
 
 clear
 echo "===================================================="
@@ -8,10 +11,13 @@ echo "===================================================="
 echo ""
 
 # 1. Get Remote Server Details
-read -p "Enter Remote Server IP: " REMOTE_IP
-read -p "Enter Remote User (default: root): " REMOTE_USER
+printf "Enter Remote Server IP: "
+read REMOTE_IP
+printf "Enter Remote User (default: root): "
+read REMOTE_USER
 REMOTE_USER=${REMOTE_USER:-root}
-read -s -p "Enter Remote Password: " REMOTE_PASS
+printf "Enter Remote Password: "
+read -s REMOTE_PASS
 echo ""
 
 # 2. Install sshpass if missing
