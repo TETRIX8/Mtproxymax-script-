@@ -1,24 +1,28 @@
 #!/bin/bash
-# MTProxyMax Interactive Deployer (Fixed for curl | bash)
+# MTProxyMax Automation & Key Pool Setup
 
-# Force input from TTY if running via curl | bash
-exec < /dev/tty
-
-clear
-echo "===================================================="
-echo "   MTProxyMax Automation & Key Pool Setup"
-echo "===================================================="
-echo ""
-
-# 1. Get Remote Server Details
-printf "Enter Remote Server IP: "
-read REMOTE_IP
-printf "Enter Remote User (default: root): "
-read REMOTE_USER
-REMOTE_USER=${REMOTE_USER:-root}
-printf "Enter Remote Password: "
-read -s REMOTE_PASS
-echo ""
+# Check if arguments are provided, otherwise use interactive input
+if [ "$#" -ge 2 ]; then
+    REMOTE_IP="$1"
+    REMOTE_PASS="$2"
+    REMOTE_USER="${3:-root}"
+else
+    # Force input from TTY if running via curl | bash without args
+    exec < /dev/tty
+    clear
+    echo "===================================================="
+    echo "   MTProxyMax Automation & Key Pool Setup"
+    echo "===================================================="
+    echo ""
+    printf "Enter Remote Server IP: "
+    read REMOTE_IP
+    printf "Enter Remote User (default: root): "
+    read REMOTE_USER
+    REMOTE_USER=${REMOTE_USER:-root}
+    printf "Enter Remote Password: "
+    read -s REMOTE_PASS
+    echo ""
+fi
 
 # 2. Install sshpass if missing
 if ! command -v sshpass &> /dev/null; then
