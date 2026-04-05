@@ -1,16 +1,17 @@
 #!/bin/bash
-# MTProxyMax Automation Installer
-# This script installs MTProxyMax, Worker, Pool Manager, and API Server.
+# MTProxyMax Automation Installer (Non-interactive)
 
 set -e
 
 INSTALL_DIR="/opt/mtproxymax"
 mkdir -p "$INSTALL_DIR"
 
-# 1. Install MTProxyMax
+# 1. Install MTProxyMax (Non-interactive)
 if ! command -v mtproxymax &> /dev/null; then
     echo "Installing MTProxyMax..."
-    curl -sL https://raw.githubusercontent.com/SamNet-dev/MTProxyMax/main/install.sh | bash -s -- --port 443 --domain cloudflare.com --yes
+    # Use printf to provide default answers to the installer
+    printf "\n\n\n\n\n" | curl -sL https://raw.githubusercontent.com/SamNet-dev/MTProxyMax/main/install.sh | bash
+    
     # Ensure it's in /usr/local/bin
     if [ -f "/tmp/mtproxymax.sh" ]; then
         cp /tmp/mtproxymax.sh /usr/local/bin/mtproxymax
@@ -77,8 +78,9 @@ issue_test_key() {
     local label="test_$(date +%s)"
     local key=$(get_key_from_pool "$POOL_TEST") || return 1
     local expiry=$(date -d "+1 day" +%Y-%m-%d)
-    mtproxymax secret add "$label" "$key" "true"
-    mtproxymax secret setlimits "$label" 15 5 0 "$expiry"
+    mtproxymax secret add "$label" "$key" "true" > /dev/null
+    mtproxymax secret setlimits "$label" 15 5 0 "$expiry" > /dev/null
+    echo "Test key issued: $label"
 }
 
 issue_regular_key() {
@@ -87,8 +89,9 @@ issue_regular_key() {
     local key=$(get_key_from_pool "$POOL_REGULAR") || return 1
     local expiry="0"
     [ -n "$period" ] && expiry=$(date -d "$period" +%Y-%m-%d)
-    mtproxymax secret add "$label" "$key" "true"
-    [ "$expiry" != "0" ] && mtproxymax secret setlimits "$label" 15 5 0 "$expiry"
+    mtproxymax secret add "$label" "$key" "true" > /dev/null
+    [ "$expiry" != "0" ] && mtproxymax secret setlimits "$label" 15 5 0 "$expiry" > /dev/null
+    echo "Regular key issued: $label"
 }
 
 case "$1" in
@@ -129,7 +132,7 @@ if __name__ == "__main__": uvicorn.run(app, host="0.0.0.0", port=8000)
 EOF
 
 # 5. Install Python dependencies
-apt-get update && apt-get install -y python3-pip
+apt-get update -qq && apt-get install -y python3-pip -qq > /dev/null
 pip3 install fastapi uvicorn --break-system-packages || pip3 install fastapi uvicorn
 
 # 6. Setup Cron
